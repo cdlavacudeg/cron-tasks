@@ -1,0 +1,41 @@
+{
+  "name": "backend-node",
+  "version": "1.0.0",
+  "description": "Backend challenge Biz Nation",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "format:check": "prettier --check .",
+    "format:write": "prettier --write .",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "pre-commit": [
+    "format:check"
+  ],
+  "keywords": [
+    "backend",
+    "node",
+    "sequelize",
+    "postgresql"
+  ],
+  "author": "Cristian Lavacude",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "pre-commit": "^1.2.2",
+    "prettier": "^2.7.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-validator": "^6.14.2",
+    "pg": "^8.7.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.21.3"
+  }
+}

@@ -1,34 +1,16 @@
 const ping = require('ping')
 const puppeteer = require('puppeteer')
 const nodeCron = require('node-cron')
-
-var hosts = [
-  // 'https://stackoverflow.com/questions/18123211/checking-host-availability-by-using-ping-in-bash-scripts',
-  // 'https://www.w3schools.com/js/js_errors.asp',
-  'https://docs.docker.com/engine/reference/commandline/compose_convert/',
-  //   'https://www.freecodecamp.org/news/schedule-a-job-in-node-with-nodecron/',
-  //   'https://www.postgresqltutorial.com/postgresql-cheat-sheet/',
-  //   'https://dev.to/code_jedi/web-scraping-in-nodejs-2lkf',
-  //   'https://www.npmjs.com/package/ping',
-  //
-]
+const { models } = require('../libs/sequelize')
 
 const config = {
   timeout: 10, // Time out in seconds for each ping request.
   extra: ['-i', '2'], // Interval of 2 seconds (ping -i 2 host)
 }
 
-async function scheduleTask(url) {
+async function scrapeUrl(url) {
   try {
-    // Ping the Url
-    const host = domain_from_url(url)
-    const response = await ping.promise.probe(host, config)
-    const msg = response.alive
-      ? `host ${host} is alive, time: ${response.time} ms`
-      : `host ${host} is dead`
-    console.log(msg)
-    // Scrap the headers
-    // This will help us compute the duration of the job later
+    // --- Scrap the header or 1000 words of the body ----- //
     // Launch puppeteeer
     const browser = await puppeteer.launch({
       args: ['--window-size=1920,1080'],
@@ -37,35 +19,37 @@ async function scheduleTask(url) {
         height: 1080,
       },
     })
-    // Change the message on the terminal as we launch
-    // a new headless browser page
-    // console.log('Launching headless browser page')
     // Launch a new headless browser page
     const newPage = await browser.newPage()
-    // Change the message on the terminal as we navigate
-    // to the URL of the page we are scraping
-    // console.log('Navigating to URL')
-
+    // Navigate to the url
     await newPage.goto(url, { waitUntil: 'load', timeout: 0 })
-    // console.log('Scraping page')
-
-    // var header = await newPage.waitForSelector('header')
+    console.log('Scraping page')
+    // Select header or body
     try {
       var element = await newPage.waitForSelector('header', { timeout: 100 })
     } catch (error) {
       element = await newPage.waitForSelector('body')
     }
-
+    // Extract the text of the selector
     var text = await newPage.evaluate((element) => element.innerText, element)
-    console.log(text.slice(0, 1000))
+    text = text.slice(0, 1000) // Only the first 1000 characters
     await browser.close()
-    console.log(`Web scraped on ${new Date().toISOString()}`)
+    const scrapedDate = new Date().toISOString()
+    console.log(`Web scraped on ${scrapedDate}`)
+    await models.Task.create({
+      url,
+      scrapedDate,
+    })
+    return text
   } catch (error) {
     console.log(error)
+    throw new Error(error.message)
   }
 }
 
 function domain_from_url(url) {
+  // Function to extract the domain of an url using regular expresions
+  // Extracted from stackoverflow
   var result
   var match
   if (
@@ -80,10 +64,25 @@ function domain_from_url(url) {
   }
   return result
 }
-let contador = 15
-hosts.map((url) => {
-  nodeCron.schedule(`*/${contador} * * * * *`, () => {
-    scheduleTask(url)
-  })
-  // contador+=1;
-})
+
+async function pingUrl(url) {
+  // Ping the url, to verify if it is alive
+  const host = domain_from_url(url)
+  const response = await ping.promise.probe(host, config)
+  const msg = response.alive
+    ? `host ${host} is alive, time: ${response.time} ms`
+    : `host ${host} is dead`
+  console.log(msg)
+  return response.alive
+}
+
+async function scheduleTask(cron, url) {
+  //We schedule the task only if the host is alive
+  if (await pingUrl(url)) {
+    nodeCron.schedule(cron, () => {
+      scrapeUrl(url)
+    })
+  }
+}
+
+module.exports = { scheduleTask }

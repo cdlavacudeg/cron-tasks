@@ -39,6 +39,7 @@
     "pg-hstore": "^2.3.4",
     "ping": "^0.4.2",
     "puppeteer": "^15.4.0",
-    "sequelize": "^6.21.3"
+    "sequelize": "^6.21.3",
+    "swagger-ui-express": "^4.5.0"
   }
 }

@@ -7,7 +7,8 @@ const response = require('./utils/response.util')
 const { bodySchema } = require('./utils/schema-validator.util')
 const { checkSchema } = require('express-validator')
 const { validateField } = require('./utils/validate-fields')
-
+const swaggerUi = require('swagger-ui-express')
+const swaggerDoc = require('./swagger.json')
 const app = express()
 const port = config.port
 
@@ -23,13 +24,13 @@ app.get('/', (req, res) => {
   res.send('Welcome to this scheduled task API')
 })
 
-app.get('/tasks', async (req, res) => {
+app.get('/api/v1/scraped', async (req, res) => {
   const tasks = await models.Task.findAll()
   response.success(req, res, 'API get - List of url and scraped date', tasks)
 })
 
 app.post(
-  '/scheduled-task',
+  '/api/v1/schedule-task',
   checkSchema(bodySchema),
   validateField,
   async (req, res) => {
@@ -42,6 +43,8 @@ app.post(
     }
   }
 )
+
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc))
 
 app.use('*', (req, res) => {
   res.send('Page not found')

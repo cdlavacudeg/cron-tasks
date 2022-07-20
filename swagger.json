@@ -1,0 +1,130 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "Task scheduler app",
+    "version": "1.0.0",
+    "title": "TaskScheduler"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api/v1",
+  "tags": [
+    {
+      "name": "API requests",
+      "description": "requests of the api"
+    }
+  ],
+  "schemes": ["http"],
+  "paths": {
+    "/scraped": {
+      "get": {
+        "tags": ["API requests"],
+        "summary": "List of url and scraped date",
+        "description": "",
+        "operationId": "listScraped",
+        "produces": ["application/json"],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "API Get - List of url and scraped date",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "statusCode": {
+                  "type": "integer",
+                  "format": "int64",
+                  "example": 200
+                },
+                "error": {
+                  "type": "string",
+                  "example": ""
+                },
+                "msg": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "scrapeDate": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/schedule-task": {
+      "post": {
+        "tags": ["API requests"],
+        "summary": "Create a scheduled task",
+        "description": "Create a scheduled task to scrape a url with a corn expression",
+        "operationId": "createTask",
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Task Scheduled",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Task"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "successful operation"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Task": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "example": "https://www.npmjs.com/package/cron-validate"
+        },
+        "cron": {
+          "type": "string",
+          "example": "*/15 * * * * * *"
+        }
+      }
+    },
+    "ApiResponse": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "error": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "data": {
+          "type": "oject"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  }
+}

@@ -82,6 +82,8 @@ async function scheduleTask(cron, url) {
     nodeCron.schedule(cron, () => {
       scrapeUrl(url)
     })
+  } else {
+    throw new Error('The host is dead')
   }
 }
 

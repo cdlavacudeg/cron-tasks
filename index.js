@@ -3,6 +3,7 @@ const cors = require('cors')
 const { config } = require('./config')
 const { models } = require('./libs/sequelize')
 const { scheduleTask } = require('./controller')
+const response = require('./utils/response.util')
 
 const app = express()
 const port = config.port
@@ -21,16 +22,16 @@ app.get('/', (req, res) => {
 
 app.get('/tasks', async (req, res) => {
   const tasks = await models.Task.findAll()
-  res.json(tasks)
+  response.success(req, res, 'API get - List of url and scraped date', tasks)
 })
 
 app.post('/scheduled-task', async (req, res) => {
   try {
     const { url, cron } = req.body
     await scheduleTask(cron, url)
-    res.send('Task scheduled')
+    response.success(req, res, 'Task scheduled', { url, cron }, 201)
   } catch (error) {
-    res.send(error)
+    response.error(req, res, error.message)
   }
 })
 

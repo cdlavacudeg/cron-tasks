@@ -11,6 +11,7 @@
   "rules": {
     "indent": ["error", 2],
     "linebreak-style": ["error", "unix"],
-    "quotes": ["error", "single"]
+    "quotes": ["error", "single"],
+    "no-unused-vars": ["error", { "args": "none" }]
   }
 }

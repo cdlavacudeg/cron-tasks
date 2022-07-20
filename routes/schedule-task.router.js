@@ -11,13 +11,18 @@ const { validateField } = require('./../utils/validate-fields')
 // Router
 const router = express.Router()
 
-router.post('/', checkSchema(bodySchema), validateField, async (req, res) => {
-  try {
-    const { url, cron } = req.body
-    await service.scheduleTask(cron, url)
-    response.success(req, res, 'Task scheduled', { url, cron }, 201)
-  } catch (error) {
-    response.error(req, res, error.message)
+router.post(
+  '/',
+  checkSchema(bodySchema),
+  validateField,
+  async (req, res, next) => {
+    try {
+      const { url, cron } = req.body
+      await service.scheduleTask(cron, url)
+      response.success(req, res, 'Task scheduled', { url, cron }, 201)
+    } catch (error) {
+      next(error)
+    }
   }
-})
+)
 module.exports = router

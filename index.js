@@ -3,6 +3,12 @@ const cors = require('cors')
 const { config } = require('./config')
 const swaggerUi = require('swagger-ui-express')
 const swaggerDoc = require('./swagger.json')
+const {
+  logErrors,
+  errorHandler,
+  ormErrorHandler,
+} = require('./middlewares/error.handler')
+const response = require('./utils/response.util')
 
 const app = express()
 const port = config.port
@@ -26,8 +32,13 @@ routerApi(app)
 
 // Pege not found
 app.use('*', (req, res) => {
-  res.send('Page not found')
+  response.error(req, res, 'Page not found', 400)
 })
+
+//Error handler
+app.use(logErrors)
+app.use(ormErrorHandler)
+app.use(errorHandler)
 
 app.listen(port, () => {
   console.log(`Server on port ${port}`)

@@ -1,6 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const { config } = require('./config')
+const { models } = require('./libs/sequelize')
 
 const app = express()
 const port = config.port
@@ -15,6 +16,11 @@ app.use(express.json())
 
 app.get('/', (req, res) => {
   res.send('Welcome to this scheduled task API')
+})
+
+app.get('/tasks', async (req, res) => {
+  const tasks = await models.Task.findAll()
+  res.json(tasks)
 })
 
 app.use('*', (req, res) => {

@@ -3,11 +3,6 @@ const puppeteer = require('puppeteer')
 const nodeCron = require('node-cron')
 const { models } = require('../libs/sequelize')
 
-const config = {
-  timeout: 10, // Time out in seconds for each ping request.
-  extra: ['-i', '2'], // Interval of 2 seconds (ping -i 2 host)
-}
-
 async function scrapeUrl(url) {
   try {
     // --- Scrap the header or 1000 words of the body ----- //
@@ -63,6 +58,12 @@ function domain_from_url(url) {
     }
   }
   return result
+}
+
+// Ping config
+const config = {
+  timeout: 3, // Time out in seconds for each ping request.
+  extra: ['-i', '2'], // Interval of 2 seconds (ping -i 2 host)
 }
 
 async function pingUrl(url) {

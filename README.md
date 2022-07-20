@@ -15,4 +15,15 @@ and a URL as input, and then execute the job according to the schedule.
 - [ ] Url Preview for CronCron
 
 The cron command-line utility, also known as cron job is a job scheduler on Unixlike operating systems. Users who set up
-and maintain software environments use cron to schedule jobs (commands or shell...)
+a
+
+### Allowed values of Cron Expression
+
+| field        | value                             |
+| ------------ | --------------------------------- |
+| second       | 0-59                              |
+| minute       | 0-59                              |
+| hour         | 0-23                              |
+| day of month | 1-31                              |
+| month        | 1-12 (or names)                   |
+| day of week  | 0-7 (or names, 0 or 7 are sunday) |

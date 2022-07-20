@@ -4,6 +4,9 @@ const { config } = require('./config')
 const { models } = require('./libs/sequelize')
 const { scheduleTask } = require('./controller')
 const response = require('./utils/response.util')
+const { bodySchema } = require('./utils/schema-validator.util')
+const { checkSchema } = require('express-validator')
+const { validateField } = require('./utils/validate-fields')
 
 const app = express()
 const port = config.port
@@ -25,15 +28,20 @@ app.get('/tasks', async (req, res) => {
   response.success(req, res, 'API get - List of url and scraped date', tasks)
 })
 
-app.post('/scheduled-task', async (req, res) => {
-  try {
-    const { url, cron } = req.body
-    await scheduleTask(cron, url)
-    response.success(req, res, 'Task scheduled', { url, cron }, 201)
-  } catch (error) {
-    response.error(req, res, error.message)
+app.post(
+  '/scheduled-task',
+  checkSchema(bodySchema),
+  validateField,
+  async (req, res) => {
+    try {
+      const { url, cron } = req.body
+      await scheduleTask(cron, url)
+      response.success(req, res, 'Task scheduled', { url, cron }, 201)
+    } catch (error) {
+      response.error(req, res, error.message)
+    }
   }
-})
+)
 
 app.use('*', (req, res) => {
   res.send('Page not found')
